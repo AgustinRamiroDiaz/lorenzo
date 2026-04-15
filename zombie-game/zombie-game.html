@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zombie Massacre con KAPLAY</title>
+    <title>Masacre Zombi con KAPLAY</title>
     <style>
         * {
             margin: 0;
@@ -19,15 +19,15 @@
             font-family: 'Segoe UI', sans-serif;
             overflow: hidden;
         }
-        #gameContainer {
+        #contenedorJuego {
             position: relative;
         }
-        #gameCanvas {
+        #lienzoJuego {
             border: 4px solid #e94560;
             border-radius: 8px;
             cursor: crosshair;
         }
-        #ui {
+        #interfaz {
             position: absolute;
             top: 10px;
             left: 10px;
@@ -36,10 +36,10 @@
             text-shadow: 2px 2px 4px #000;
             pointer-events: none; /* Para no bloquear clics del juego */
         }
-        #ui span {
+        #interfaz span {
             margin-right: 20px;
         }
-        #gameOver {
+        #finDeJuego {
             position: absolute;
             top: 50%;
             left: 50%;
@@ -52,7 +52,7 @@
             display: none;
             z-index: 10;
         }
-        #gameOver button {
+        #finDeJuego button {
             margin-top: 20px;
             padding: 15px 30px;
             font-size: 20px;
@@ -62,10 +62,10 @@
             border-radius: 8px;
             cursor: pointer;
         }
-        #gameOver button:hover {
+        #finDeJuego button:hover {
             background: #ff6b6b;
         }
-        #startScreen {
+        #pantallaInicio {
             position: absolute;
             top: 0;
             left: 0;
@@ -79,18 +79,18 @@
             color: #fff;
             z-index: 10;
         }
-        #startScreen h1 {
+        #pantallaInicio h1 {
             font-size: 64px;
             color: #e94560;
             text-shadow: 3px 3px 6px #000;
             margin-bottom: 20px;
         }
-        #startScreen p {
+        #pantallaInicio p {
             font-size: 18px;
             margin-bottom: 30px;
             text-align: center;
         }
-        #startScreen button {
+        #pantallaInicio button {
             padding: 20px 50px;
             font-size: 24px;
             background: #e94560;
@@ -99,28 +99,28 @@
             border-radius: 8px;
             cursor: pointer;
         }
-        #startScreen button:hover {
+        #pantallaInicio button:hover {
             background: #ff6b6b;
         }
     </style>
 </head>
 <body>
-    <div id="gameContainer">
-        <canvas id="gameCanvas" width="800" height="600"></canvas>
-        <div id="ui">
-            <span>🧟 Puntos: <b id="score">0</b></span>
-            <span>❤️ Vida: <b id="health">100</b></span>
-            <span>🌊 Oleada: <b id="wave">1</b></span>
+    <div id="contenedorJuego">
+        <canvas id="lienzoJuego" width="800" height="600"></canvas>
+        <div id="interfaz">
+            <span>🧟 Puntos: <b id="puntos">0</b></span>
+            <span>❤️ Vida: <b id="salud">100</b></span>
+            <span>🌊 Oleada: <b id="oleada">1</b></span>
         </div>
-        <div id="gameOver">
-            <div>💀 GAME OVER 💀</div>
-            <div>Puntuación: <span id="finalScore">0</span></div>
-            <button onclick="restartGame()">Jugar de Nuevo</button>
+        <div id="finDeJuego">
+            <div>💀 FIN DEL JUEGO 💀</div>
+            <div>Puntuación: <span id="puntuacionFinal">0</span></div>
+            <button onclick="reiniciarJuego()">Jugar de Nuevo</button>
         </div>
-        <div id="startScreen">
-            <h1>🧟 ZOMBIE MASSACRE 🧟</h1>
-            <p>¡Mata a los zombies antes de que te alcancen!<br>Usa <b>WASD</b> o <b>flechas</b> para moverte y el <b>mouse</b> para apuntar y disparar.</p>
-            <button onclick="startGame()">▶ JUGAR</button>
+        <div id="pantallaInicio">
+            <h1>🧟 MASACRE ZOMBI 🧟</h1>
+            <p>¡Mata a los zombis antes de que te alcancen!<br>Usa <b>WASD</b> o <b>flechas</b> para moverte y el <b>ratón</b> para apuntar y disparar.</p>
+            <button onclick="iniciarJuego()">▶ JUGAR</button>
         </div>
     </div>
 
@@ -129,39 +129,39 @@
     <script>
         // Inicializar Kaplay vinculándolo al canvas existente del DOM
         kaplay({
-            canvas: document.getElementById('gameCanvas'),
+            canvas: document.getElementById('lienzoJuego'),
             background: [22, 33, 62], // #16213e
             width: 800,
             height: 600,
             global: true     // Inyecta funciones en el scope global como kaboom
         });
 
-        // Variables de estado mapeadas con el UI
-        let currentScore = 0;
-        let currentHealth = 100;
-        let currentWave = 1;
+        // Variables de estado mapeadas con la interfaz
+        let puntuacionActual = 0;
+        let saludActual = 100;
+        let oleadaActual = 1;
 
-        function updateUI() {
-            document.getElementById('score').textContent = currentScore;
-            document.getElementById('health').textContent = Math.max(0, currentHealth);
-            document.getElementById('wave').textContent = currentWave;
+        function actualizarInterfaz() {
+            document.getElementById('puntos').textContent = puntuacionActual;
+            document.getElementById('salud').textContent = Math.max(0, saludActual);
+            document.getElementById('oleada').textContent = oleadaActual;
         }
 
         // Función para estrellas de fondo espaciales
-        function createStars() {
+        function crearEstrellas() {
             for (let i = 0; i < 50; i++) {
                 add([
                     circle(1),
                     pos(rand(0, width()), rand(0, height())),
                     color(255, 255, 255),
                     opacity(rand(0.1, 0.3)),
-                    "star"
+                    "estrella"
                 ]);
             }
         }
 
         // Función reutilizable para crear sangre (partículas físicas simples)
-        function createBlood(p) {
+        function crearSangre(p) {
             for (let i = 0; i < 15; i++) {
                 add([
                     pos(p.x, p.y),
@@ -185,36 +185,36 @@
         }
 
         // === ESCENA PRINCIPAL DEL JUEGO ===
-        scene("game", () => {
-            createStars(); // Generamos el ambiente
+        scene("juego", () => {
+            crearEstrellas(); // Generamos el ambiente
 
-            currentScore = 0;
-            currentHealth = 100;
-            currentWave = 1;
-            updateUI();
+            puntuacionActual = 0;
+            saludActual = 100;
+            oleadaActual = 1;
+            actualizarInterfaz();
 
-            let zombiesToSpawn = 5;
-            let zombiesSpawned = 0;
+            let zombisAAparecer = 5;
+            let zombisAparecidos = 0;
 
             // -- Jugador --
-            const player = add([
+            const jugador = add([
                 circle(25),
                 pos(width() / 2, height() / 2),
                 color(52, 152, 219),
                 area(),
                 anchor("center"),
-                "player",
-                { speed: 300 }
+                "jugador",
+                { velocidad: 300 }
             ]);
 
             // Sistema de dibujo manual del arma y detalles del personaje
-            player.onDraw(() => {
-                const mousePosLocal = mousePos().sub(player.pos);
+            jugador.onDraw(() => {
+                const posicionRatonLocal = mousePos().sub(jugador.pos);
                 
                 // Arma apuntando hacia donde mira el usuario
                 drawLine({
                     p1: vec2(0, 0),
-                    p2: mousePosLocal,
+                    p2: posicionRatonLocal,
                     width: 3,
                     color: rgb(41, 128, 185)
                 });
@@ -228,32 +228,32 @@
             });
 
             // Movilidad atada a KAPLAY
-            onKeyDown("w", () => { if (currentHealth > 0) player.move(0, -player.speed); });
-            onKeyDown("s", () => { if (currentHealth > 0) player.move(0, player.speed); });
-            onKeyDown("a", () => { if (currentHealth > 0) player.move(-player.speed, 0); });
-            onKeyDown("d", () => { if (currentHealth > 0) player.move(player.speed, 0); });
-            onKeyDown("up", () => { if (currentHealth > 0) player.move(0, -player.speed); });
-            onKeyDown("down", () => { if (currentHealth > 0) player.move(0, player.speed); });
-            onKeyDown("left", () => { if (currentHealth > 0) player.move(-player.speed, 0); });
-            onKeyDown("right", () => { if (currentHealth > 0) player.move(player.speed, 0); });
+            onKeyDown("w", () => { if (saludActual > 0) jugador.move(0, -jugador.velocidad); });
+            onKeyDown("s", () => { if (saludActual > 0) jugador.move(0, jugador.velocidad); });
+            onKeyDown("a", () => { if (saludActual > 0) jugador.move(-jugador.velocidad, 0); });
+            onKeyDown("d", () => { if (saludActual > 0) jugador.move(jugador.velocidad, 0); });
+            onKeyDown("up", () => { if (saludActual > 0) jugador.move(0, -jugador.velocidad); });
+            onKeyDown("down", () => { if (saludActual > 0) jugador.move(0, jugador.velocidad); });
+            onKeyDown("left", () => { if (saludActual > 0) jugador.move(-jugador.velocidad, 0); });
+            onKeyDown("right", () => { if (saludActual > 0) jugador.move(jugador.velocidad, 0); });
 
             // Delimita el jugador a la pantalla
-            player.onUpdate(() => {
-                if (player.pos.x < 25) player.pos.x = 25;
-                if (player.pos.y < 25) player.pos.y = 25;
-                if (player.pos.x > width() - 25) player.pos.x = width() - 25;
-                if (player.pos.y > height() - 25) player.pos.y = height() - 25;
+            jugador.onUpdate(() => {
+                if (jugador.pos.x < 25) jugador.pos.x = 25;
+                if (jugador.pos.y < 25) jugador.pos.y = 25;
+                if (jugador.pos.x > width() - 25) jugador.pos.x = width() - 25;
+                if (jugador.pos.y > height() - 25) jugador.pos.y = height() - 25;
             });
 
             // Acción Disparar
             onClick(() => {
-                if (currentHealth <= 0) return;
+                if (saludActual <= 0) return;
                 
-                const dir = mousePos().sub(player.pos).unit();
+                const dir = mousePos().sub(jugador.pos).unit();
                 
-                // Efecto de cañónazo
+                // Efecto de cañonazo
                 add([
-                    pos(player.pos),
+                    pos(jugador.pos),
                     circle(rand(3, 7)),
                     color(255, 255, 0),
                     anchor("center"),
@@ -273,96 +273,96 @@
 
                 // Generar Bala
                 add([
-                    pos(player.pos),
+                    pos(jugador.pos),
                     circle(6),
                     color(255, 255, 0),
                     area(),
                     anchor("center"),
                     move(dir, 900),
                     offscreen({ destroy: true }),
-                    "bullet"
+                    "bala"
                 ]);
             });
 
-            // -- Enemigos Zombie --
-            function spawnZombie() {
-                const side = Math.floor(rand(0, 4));
+            // -- Enemigos Zombi --
+            function aparecerZombi() {
+                const lado = Math.floor(rand(0, 4));
                 let x, y;
 
-                if (side === 0) { x = rand(0, width()); y = -50; }
-                else if (side === 1) { x = width() + 50; y = rand(0, height()); }
-                else if (side === 2) { x = rand(0, width()); y = height() + 50; }
+                if (lado === 0) { x = rand(0, width()); y = -50; }
+                else if (lado === 1) { x = width() + 50; y = rand(0, height()); }
+                else if (lado === 2) { x = rand(0, width()); y = height() + 50; }
                 else { x = -50; y = rand(0, height()); }
 
-                const size = rand(40, 60);
-                const baseHealth = 2 + Math.floor(currentWave / 3);
+                const tamano = rand(40, 60);
+                const saludBase = 2 + Math.floor(oleadaActual / 3);
 
                 add([
-                    circle(size / 2),
+                    circle(tamano / 2),
                     pos(x, y),
                     color(74, 124, 89),
                     area(),
                     anchor("center"),
-                    "zombie",
+                    "zombi",
                     {
-                        maxHealth: baseHealth,
-                        hp: baseHealth,
-                        speed: 30 + rand(0, 18) + currentWave * 3,
-                        hitTimer: 0,
-                        zSize: size
+                        saludMaxima: saludBase,
+                        puntosDeSalud: saludBase,
+                        velocidad: 30 + rand(0, 18) + oleadaActual * 3,
+                        temporizadorGolpe: 0,
+                        tamanoZ: tamano
                     }
                 ]);
             }
 
             // Temporizador continuo para lanzar la oleada
             loop(1, () => {
-                if (zombiesSpawned < zombiesToSpawn) {
-                    spawnZombie();
-                    zombiesSpawned++;
+                if (zombisAparecidos < zombisAAparecer) {
+                    aparecerZombi();
+                    zombisAparecidos++;
                 }
             });
 
             // Monitorear y subir la oleada
             onUpdate(() => {
-                if (zombiesSpawned === zombiesToSpawn && get("zombie").length === 0) {
-                    currentWave++;
-                    zombiesToSpawn = 5 + currentWave * 3;
-                    zombiesSpawned = 0;
-                    currentHealth = Math.min(100, currentHealth + 20);
-                    updateUI();
+                if (zombisAparecidos === zombisAAparecer && get("zombi").length === 0) {
+                    oleadaActual++;
+                    zombisAAparecer = 5 + oleadaActual * 3;
+                    zombisAparecidos = 0;
+                    saludActual = Math.min(100, saludActual + 20);
+                    actualizarInterfaz();
                 }
             });
 
-            // Lógica Zombie: Seguir al jugador y colorear
-            onUpdate("zombie", (z) => {
-                const dir = player.pos.sub(z.pos).unit();
-                z.move(dir.scale(z.speed));
+            // Lógica Zombi: Seguir al jugador y colorear
+            onUpdate("zombi", (z) => {
+                const dir = jugador.pos.sub(z.pos).unit();
+                z.move(dir.scale(z.velocidad));
 
-                if (z.hitTimer > 0) {
-                    z.hitTimer -= dt();
-                    z.color = rgb(255, 255, 255); // Flash de daño activo
+                if (z.temporizadorGolpe > 0) {
+                    z.temporizadorGolpe -= dt();
+                    z.color = rgb(255, 255, 255); // Destello de daño activo
                 } else {
                     z.color = rgb(74, 124, 89);
                 }
 
-                // Intersección con el personaje manualmente para mejor control del timing:
-                if (player.pos.dist(z.pos) < 25 + z.zSize / 2) {
-                    currentHealth -= 10;
+                // Intersección con el personaje manualmente para mejor control del ritmo:
+                if (jugador.pos.dist(z.pos) < 25 + z.tamanoZ / 2) {
+                    saludActual -= 10;
                     z.destroy();
-                    createBlood(player.pos);
-                    updateUI();
+                    crearSangre(jugador.pos);
+                    actualizarInterfaz();
 
-                    if (currentHealth <= 0) {
-                        endGame();
+                    if (saludActual <= 0) {
+                        terminarJuego();
                     }
                 }
             });
 
-            // Recrear detalles gráficos del zombie (barra de vida, forma, etc.)
-            onDraw("zombie", (z) => {
-                const eyeColor = z.hitTimer > 0 ? rgb(255, 0, 0) : rgb(45, 74, 62);
-                drawCircle({ pos: vec2(-8, -5), radius: 6, color: eyeColor });
-                drawCircle({ pos: vec2(8, -5), radius: 6, color: eyeColor });
+            // Recrear detalles gráficos del zombi (barra de vida, forma, etc.)
+            onDraw("zombi", (z) => {
+                const colorOjo = z.temporizadorGolpe > 0 ? rgb(255, 0, 0) : rgb(45, 74, 62);
+                drawCircle({ pos: vec2(-8, -5), radius: 6, color: colorOjo });
+                drawCircle({ pos: vec2(8, -5), radius: 6, color: colorOjo });
 
                 drawCircle({ pos: vec2(-8, -5), radius: 3, color: rgb(26, 26, 46) });
                 drawCircle({ pos: vec2(8, -5), radius: 3, color: rgb(26, 26, 46) });
@@ -381,64 +381,64 @@
                     color: rgb(51, 51, 51)
                 });
 
-                // Trazar barra de vida zombie flotante
-                const hpPercent = z.hp / z.maxHealth;
-                const hpY = -z.zSize / 2 - 10;
+                // Trazar barra de vida del zombi flotante
+                const porcentajeSalud = z.puntosDeSalud / z.saludMaxima;
+                const posicionYSalud = -z.tamanoZ / 2 - 10;
                 
-                drawRect({ pos: vec2(-z.zSize / 2, hpY), width: z.zSize, height: 5, color: rgb(51, 51, 51) });
+                drawRect({ pos: vec2(-z.tamanoZ / 2, posicionYSalud), width: z.tamanoZ, height: 5, color: rgb(51, 51, 51) });
 
-                let hpColor = rgb(0, 255, 0);
-                if (hpPercent <= 0.25) hpColor = rgb(255, 0, 0);
-                else if (hpPercent <= 0.5) hpColor = rgb(255, 255, 0);
+                let colorSalud = rgb(0, 255, 0);
+                if (porcentajeSalud <= 0.25) colorSalud = rgb(255, 0, 0);
+                else if (porcentajeSalud <= 0.5) colorSalud = rgb(255, 255, 0);
                 
-                drawRect({ pos: vec2(-z.zSize / 2, hpY), width: z.zSize * hpPercent, height: 5, color: hpColor });
+                drawRect({ pos: vec2(-z.tamanoZ / 2, posicionYSalud), width: z.tamanoZ * porcentajeSalud, height: 5, color: colorSalud });
             });
 
-            // Detección de Colisión Bala -> Zombie
-            onCollide("bullet", "zombie", (b, z) => {
-                if (b.hasCollided === z.id) return; 
-                b.hasCollided = z.id;
+            // Detección de Colisión Bala -> Zombi
+            onCollide("bala", "zombi", (b, z) => {
+                if (b.haColisionado === z.id) return; 
+                b.haColisionado = z.id;
                 
                 b.destroy();
-                z.hp--;
-                z.hitTimer = 0.1;
+                z.puntosDeSalud--;
+                z.temporizadorGolpe = 0.1;
 
-                if (z.hp <= 0) {
-                    createBlood(z.pos);
+                if (z.puntosDeSalud <= 0) {
+                    crearSangre(z.pos);
                     z.destroy();
-                    currentScore += 10;
-                    updateUI();
+                    puntuacionActual += 10;
+                    actualizarInterfaz();
                 }
             });
         });
 
         // === ESCENAS DE MENÚS SECUNDARIAS ===
-        scene("start", () => {
-            createStars();
+        scene("inicio", () => {
+            crearEstrellas();
         });
 
-        scene("gameover", () => {
-            createStars();
+        scene("finDelJuego", () => {
+            crearEstrellas();
         });
 
         // Iniciar suspendido a la espera del botón JUGAR en el html
-        go("start");
+        go("inicio");
 
         // === EVENTOS DEL DOM ===
-        window.startGame = () => {
-            document.getElementById('startScreen').style.display = 'none';
-            document.getElementById('gameOver').style.display = 'none';
-            go("game");
+        window.iniciarJuego = () => {
+            document.getElementById('pantallaInicio').style.display = 'none';
+            document.getElementById('finDeJuego').style.display = 'none';
+            go("juego");
         };
 
-        window.restartGame = () => {
-            window.startGame();
+        window.reiniciarJuego = () => {
+            window.iniciarJuego();
         };
 
-        function endGame() {
-            document.getElementById('finalScore').textContent = currentScore;
-            document.getElementById('gameOver').style.display = 'block';
-            go("gameover"); // Corta la ejecución de la partida
+        function terminarJuego() {
+            document.getElementById('puntuacionFinal').textContent = puntuacionActual;
+            document.getElementById('finDeJuego').style.display = 'block';
+            go("finDelJuego"); // Corta la ejecución de la partida
         }
     </script>
 </body>
