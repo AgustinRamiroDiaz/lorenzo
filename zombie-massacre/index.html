@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Masacre Zombi con KAPLAY</title>
+</head>
+<body>
+    <div id="contenedorJuego">
+        <canvas id="lienzoJuego" width="800" height="600"></canvas>
+        <div id="interfaz">
+            <span>🧟 Puntos: <b id="puntos">0</b></span>
+            <span>❤️ Vida: <b id="salud">100</b></span>
+            <span>🌊 Oleada: <b id="oleada">1</b></span>
+        </div>
+        <div id="finDeJuego">
+            <div>💀 FIN DEL JUEGO 💀</div>
+            <div>Puntuación: <span id="puntuacionFinal">0</span></div>
+            <button id="btnReiniciar">Jugar de Nuevo</button>
+        </div>
+        <div id="pantallaInicio">
+            <h1>🧟 MASACRE ZOMBI 🧟</h1>
+            <p>¡Mata a los zombis antes de que te alcancen!<br>Usa <b>WASD</b> o <b>flechas</b> para moverte y el <b>ratón</b> para apuntar y disparar.</p>
+            <button id="btnIniciar">▶ JUGAR</button>
+        </div>
+    </div>
+    <script src="src/main.ts" type="module"></script>
+</body>
+</html>
