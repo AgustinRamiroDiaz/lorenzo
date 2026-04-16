@@ -5,15 +5,22 @@
 		"build": "vite build",
 		"dev": "vite",
 		"preview": "vite preview",
+		"lint": "eslint .",
 		"zip": "npm run build && mkdir -p dist && zip -r dist/game.zip dist -x \"**/.DS_Store\"",
-		"check": "tsc"
+		"check": "tsc",
+		"prepare": "cd .. && husky zombie-massacre/.husky"
 	},
 	"dependencies": {
 		"kaplay": "^3001.0.19"
 	},
 	"devDependencies": {
+		"@eslint/js": "^10.0.1",
 		"@types/node": "^25.6.0",
+		"eslint": "^10.2.0",
+		"globals": "^17.5.0",
+		"husky": "^9.1.7",
 		"typescript": "^6.0.2",
+		"typescript-eslint": "^8.58.2",
 		"vite": "^8.0.8"
 	}
 }

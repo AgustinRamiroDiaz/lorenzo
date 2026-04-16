@@ -1,0 +1,2 @@
+cd zombie-massacre
+npm run lint
