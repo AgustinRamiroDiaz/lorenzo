@@ -19,6 +19,7 @@ let oleadaActual = 1;
 let nivelActual = 1;
 let expActual = 0;
 let expRequerida = 2000;
+let danoJugador = 1;
 
 function actualizarInterfaz() {
     const elPuntos = document.getElementById('puntos');
@@ -84,6 +85,7 @@ scene("juego", () => {
     nivelActual = 1;
     expActual = 0;
     expRequerida = 2000;
+    danoJugador = 1;
     actualizarInterfaz();
 
     let zombisAAparecer = 5;
@@ -188,7 +190,7 @@ scene("juego", () => {
         else { x = -50; y = rand(0, height()); }
 
         const tamano = rand(40, 60);
-        const saludBase = 2 + Math.floor(oleadaActual / 3);
+        const saludBase = nivelActual === 1 ? danoJugador * 3 : Math.max(2, Math.floor(danoJugador * rand(2, 5)));
 
         add([
             circle(tamano / 2),
@@ -285,6 +287,15 @@ scene("juego", () => {
         else if (porcentajeSalud <= 0.5) colorSalud = rgb(255, 255, 0);
         
         drawRect({ pos: vec2(-z.tamanoZ / 2, posicionYSalud), width: z.tamanoZ * porcentajeSalud, height: 5, color: colorSalud });
+        
+        // Dibujar el texto de la vida
+        drawText({
+            text: `${Math.max(0, Math.ceil(z.puntosDeSalud))}/${z.saludMaxima}`,
+            size: 10,
+            pos: vec2(0, posicionYSalud - 8),
+            anchor: "center",
+            color: rgb(255, 255, 255)
+        });
     });
 
     // Detección de Colisión Bala -> Zombi
@@ -293,7 +304,7 @@ scene("juego", () => {
         b.haColisionado = z.id;
         
         b.destroy();
-        z.puntosDeSalud--;
+        z.puntosDeSalud -= danoJugador;
         z.temporizadorGolpe = 0.1;
 
         if (z.puntosDeSalud <= 0) {
@@ -308,7 +319,8 @@ scene("juego", () => {
                     expActual -= expRequerida;
                     expRequerida = Math.floor(expRequerida * 1.5);
                     
-                    saludMaximaJugador += 20;
+                    danoJugador += 1.5;
+                    saludMaximaJugador += Math.floor(rand(20, 50));
                     saludActual = saludMaximaJugador;
                     (jugador as any).velocidad += 15;
                     
