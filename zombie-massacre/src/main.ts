@@ -13,17 +13,27 @@ kaplay({
 
 // Variables de estado mapeadas con la interfaz
 let puntuacionActual = 0;
+let saludMaximaJugador = 100;
 let saludActual = 100;
 let oleadaActual = 1;
+let nivelActual = 1;
+let expActual = 0;
+let expRequerida = 2000;
 
 function actualizarInterfaz() {
     const elPuntos = document.getElementById('puntos');
     const elSalud = document.getElementById('salud');
     const elOleada = document.getElementById('oleada');
+    const elNivel = document.getElementById('nivel');
+    const elExp = document.getElementById('exp');
+    const elExpMax = document.getElementById('expMax');
     
     if (elPuntos) elPuntos.textContent = puntuacionActual.toString();
     if (elSalud) elSalud.textContent = Math.max(0, saludActual).toString();
     if (elOleada) elOleada.textContent = oleadaActual.toString();
+    if (elNivel) elNivel.textContent = nivelActual.toString();
+    if (elExp) elExp.textContent = expActual.toString();
+    if (elExpMax) elExpMax.textContent = expRequerida.toString();
 }
 
 // Función para estrellas de fondo espaciales
@@ -68,8 +78,12 @@ scene("juego", () => {
     crearEstrellas(); // Generamos el ambiente
 
     puntuacionActual = 0;
+    saludMaximaJugador = 100;
     saludActual = 100;
     oleadaActual = 1;
+    nivelActual = 1;
+    expActual = 0;
+    expRequerida = 2000;
     actualizarInterfaz();
 
     let zombisAAparecer = 5;
@@ -207,7 +221,7 @@ scene("juego", () => {
             oleadaActual++;
             zombisAAparecer = 5 + oleadaActual * 3;
             zombisAparecidos = 0;
-            saludActual = Math.min(100, saludActual + 20);
+            saludActual = Math.min(saludMaximaJugador, saludActual + 20);
             actualizarInterfaz();
         }
     });
@@ -286,6 +300,35 @@ scene("juego", () => {
             crearSangre(z.pos);
             z.destroy();
             puntuacionActual += 10;
+            
+            if (nivelActual < 50) {
+                expActual += 100;
+                while (expActual >= expRequerida && nivelActual < 50) {
+                    nivelActual++;
+                    expActual -= expRequerida;
+                    expRequerida = Math.floor(expRequerida * 1.5);
+                    
+                    saludMaximaJugador += 20;
+                    saludActual = saludMaximaJugador;
+                    (jugador as any).velocidad += 15;
+                    
+                    add([
+                        text("¡NIVEL " + nivelActual + "!", { size: 32 }),
+                        pos(width() / 2, height() / 4),
+                        anchor("center"),
+                        color(255, 255, 0),
+                        opacity(1),
+                        lifespan(2, { fade: 0.5 }),
+                        move(vec2(0, -1), 50)
+                    ]);
+                }
+                
+                if (nivelActual >= 50) {
+                    nivelActual = 50;
+                    expActual = expRequerida;
+                }
+            }
+            
             actualizarInterfaz();
         }
     });
